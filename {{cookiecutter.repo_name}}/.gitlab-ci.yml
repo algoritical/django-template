@@ -1,0 +1,74 @@
+image: python:3.8
+
+stages:
+  - docs
+  - test
+  - deploy
+
+services:
+  - postgres:12.0-alpine
+
+variables:
+  POSTGRES_DB: mymoney
+  POSTGRES_USER: postgres
+  POSTGRES_PASSWORD: postgres
+  DATABASE_URL: "postgresql://$POSTGRES_USER:$POSTGRES_PASSWORD@postgres:5432/$POSTGRES_DB"
+  SECRET_KEY: "-fydr@3isxu&g+*8c-7219(n-x%wedk7=-2o7fm7fv=p9%dthu"
+
+# This folder is cached between builds
+# http://docs.gitlab.com/ce/ci/yaml/README.html#cache
+cache:
+  key: pip-deps
+  paths:
+    - $CI_PROJECT_DIR/.cache/pip
+    - $CI_PROJECT_DIR/.cache/pipenv
+
+test:
+  variables:
+    PRE_COMMIT_HOME: "$CI_PROJECT_DIR/.cache/pre-commit"
+  cache:
+    key: pre-commit
+    paths:
+      - .cache/pre-commit
+  stage: test
+  before_script:
+    - pip install virtualenv pipenv pre-commit
+    - virtualenv venv
+    - source venv/bin/activate
+    #- pipenv install --dev
+    - pipenv sync --dev
+    - cp contrib/env-sample .env
+    - python manage.py migrate
+    - python manage.py collectstatic --noinput
+  script:
+    - pre-commit run -a --hook-stage manual
+    - pipenv run pytest
+
+staging:
+  stage: deploy
+  except:
+    - master
+  script:
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app={{cookiecutter.repo_name}}-staging --api-key=$HEROKU_API_KEY
+
+production:
+  stage: deploy
+  only:
+    - master
+  script:
+    - apt-get update -qy
+    - apt-get install -y ruby-dev
+    - gem install dpl
+    - dpl --provider=heroku --app={{cookiecutter.repo_name}} --api-key=$HEROKU_API_KEY
+
+pages:
+  stage: docs
+  script:
+    - pip install mkdocs mkdocs-material
+    - mkdocs build -d public/
+  artifacts:
+    paths:
+      - public

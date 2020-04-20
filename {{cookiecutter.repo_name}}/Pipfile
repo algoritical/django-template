@@ -1,0 +1,30 @@
+[[source]]
+name = "pypi"
+url = "https://pypi.org/simple"
+verify_ssl = true
+
+[dev-packages]
+ipython = "*"
+pytest = "*"
+pytest-watch = "*"
+factory-boy = "*"
+black = "*"
+flake8 = "*"
+mkdocs = "*"
+mkdocs-material = "*"
+
+[packages]
+django = "*"
+djangorestframework = "*"
+pendulum = "*"
+psycopg2-binary = "*"
+python-decouple = "*"
+dj-database-url = "*"
+django-extensions = "*"
+gunicorn = "*"
+
+[requires]
+python_version = "3.8"
+
+[pipenv]
+allow_prereleases = true

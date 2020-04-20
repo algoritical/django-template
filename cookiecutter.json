@@ -1,0 +1,11 @@
+{
+    "project_name": "Project Name",
+    "group_name": "Gitlab Group Name",
+    "repo_name": "{{ cookiecutter.project_name.lower().replace(' ', '-') }}",
+    "author": "Gilson Filho",
+    "email": "contato@algoritical.com",
+    "gitlab_name": "{{ cookiecutter.author.lower().replace(' ', '-') }}",
+    "version": "0.0.1",
+    "description": "Template para projetos Django",
+    "license": ["MIT License", "GNU General Public License v3" ]
+}
