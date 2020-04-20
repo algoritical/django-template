@@ -11,5 +11,5 @@ pip install cookiecutter
 
 And then run it to bootstrap your project:
 ```shell
-cookiecutter gl:algoritical-templates/django-project
+cookiecutter gh:algoritical/django-template
 ```
